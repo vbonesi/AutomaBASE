@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "automabase"
+version = "0.0.1"
+description = "Gerador e validador de arquivos .dat do SAGE"
+authors = ["Seu Nome <email@exemplo.com>"]
+packages = [{ include = "core" }, { include = "cli" }]
+
+[tool.poetry.dependencies]
+python = "^3.12"
+typer = "^0.12"
+rich = "^13.7"
+pyyaml = "^6.0"
+
+[tool.poetry.group.dev.dependencies]
+pytest = "^8.2"
+
+[tool.poetry.scripts]
+autobase = "cli.pds:app"

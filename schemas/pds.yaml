@@ -1,0 +1,48 @@
+id: PDS
+description: Entidade Ponto Digital Lógico – Base-Fonte 38
+attributes:
+  # --- Chave primária ---
+  ID:        {type: char(48), required: always}
+
+  # --- Obrigatórios gerais ---
+  TAC:       {type: char(20), required: always}
+  TIPO:      {type: enum[FLCN,CHAVE,OUTROS], required: always}
+  CDINIC:    {type: enum[NORMAL,MANUAL,NAOSUP], default: NORMAL}
+  STINI:     {type: enum[A,F], default: F}
+  STNOR:     {type: enum[A,F], default: F}
+
+  # --- Flags / Booleans (SIM|NAO) ---
+  ALINT:     {type: char(3), default: NAO}
+  ALRIN:     {type: char(3), default: NAO}
+  BDTR:      {type: char(3), default: SIM}
+  SOEIN:     {type: char(3), default: NAO}
+  INVRT:     {type: char(3), default: NAO}
+  SELSD:     {type: char(3), default: NAO}
+  ATLZINV:   {type: char(3), default: NAO}
+  SINCR_MAN: {type: char(3), default: NAO}
+  EE:        {type: char(3), default: SIM}
+  UAPL:      {type: char(3), default: SIM}
+  HISTSLC:   {type: char(3), default: SIM}
+  HISTSLC_SOE:{type: char(3), default: NAO}
+  NCOMISS:   {type: char(3), default: NAO}
+
+  # --- Relacionamentos (opcionais) ---
+  OCR:       {type: char(20), required: never}
+  TELA:      {type: char(32), required: never}
+  TCL:       {type: char(11), required_if: calculado}
+
+  # --- Conversão / histórico ---
+  TPFIL:     {type: char(4), default: NLFL}
+  PRIOALR:   {type: int, default: 6}
+  PCONDALR:  {type: int, required: never}
+  TMP_ANORM: {type: int, default: 0}
+  VLINIC:    {type: int, default: 0}
+
+  # --- Protocolo-específicos (ignorar por ora) ---
+  IDICCP:    {type: char(32), required_if: exported_iccp}
+
+  # --- Texto livre ---
+  NOME:      {type: char(63), required: never}
+  DESC1:     {type: char(40), required: never}
+  DESC2:     {type: char(40), required: never}
+

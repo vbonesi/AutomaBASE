@@ -1,0 +1,29 @@
+# --- Python / Poetry ---
+__pycache__/
+*.py[cod]
+*.so
+*.egg-info/
+dist/
+build/
+.env
+.venv
+poetry.lock
+
+# --- IDEs & Editors ---
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# --- OneDrive artefacts ---
+*.lnk                # atalhos do Windows
+~$*                  # temp do Office
+*.tmp
+* (Conflicted copy*  # cópias de conflito
+*.OneDrive*          # metas ocultas
+
+# --- OS cruft ---
+.DS_Store
+Thumbs.db
+

@@ -33,7 +33,21 @@ attributes:
   # ─── RELACIONAMENTOS OPCIONAIS ─────────────────────────────────
   OCR:  {type: char(20), required: never}         # pré-23
   TELA: {type: char(50), required: never}         # introduzido no upd 22 (SigDraw link)
-  TCL:  {type: char(8),  required_if: calculado}  # pré-23
+ 
+  # ─── RELACIONAMENTOS / CÁLCULO ───────────────────────────────────────
+  # TCL  – Nome do cálculo associado ao ponto.
+  #        • Valor-padrão: NLCL  ➜ “Ausência de Cálculo”.
+  #        • Se o ponto for marcado como calculado, informe um ID existente
+  #          na entidade TCL ou em calculos.c.
+  #        • IDs já definidos na base demo (upd 38):
+  #          NLCL, PA, SOMA, CORRENTE, AMPSHUNT, FPOT, OU, ANDNOT, SUB, MULT,
+  #          DIV, RAIZ2, NEGA, INVERSO, DISKM, FREQ, INTEQP, E, NOU2, NOU,
+  #          OUN2, INTEDJ, INTESDV, SEL, INDI, CONV0DI, CONV1DI, CONV2DI,
+  #          ANA2, ANA4, ANA3, TIMER, CPU, BYPASS, MVALOR, MVALORP, PERCENT,
+  #          AMPD, SOMAABS
+  #        • Outros IDs podem ser adicionados conforme novos cálculos
+  #          sejam implementados.
+  TCL: {type: char(8), default: NLCL, required_if: calculado}
 
   # ─── CONVERSÃO / HISTÓRICO ─────────────────────────────────────
   TPFIL: {type: enum[NLFL,FIL1,FIL2,FIL3,FIL4,FIL5,FIL6,FIL7,FIL8,FIL9],

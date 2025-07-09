@@ -1,3 +1,4 @@
+import re                # ← nova linha
 from pathlib import Path
 import typer
 from rich import print
@@ -57,6 +58,8 @@ _STAR_FIELDS = [
 # --------------------------------------------------------------------------- #
 # COMANDO: new                                                                #
 # --------------------------------------------------------------------------- #
+_EXTRA_KV = re.compile(r"^([A-Z0-9_]+)=(.+)$")
+
 @app.command("new")
 def cli_new(
     id:      str = typer.Option(..., "--id"),
@@ -65,24 +68,35 @@ def cli_new(
     nome:    str = typer.Option(..., "--nome"),
     ocr:     str = typer.Option(..., "--ocr"),
     tipo:    str = typer.Option("OUTROS", "--tipo"),
+    extra:   list[str] = typer.Option(None, "--extra", "-e",
+                help="Pares ATRIBUTO=VALOR adicionais, pode repetir"),
 ) -> None:
-    _load_schema()                #  <<  ESTA LINHA VOLTA
+    _load_schema()
 
-    attrs = {                     # obrigatórios absolutos
-        "ID": id,
-        "TAC": tac,
-        "TPEQP": tpeqp,
-        "OCR": ocr,
-        "NOME": nome,
+    # -------- obrigatórios absolutos ------------
+    attrs = {
+        "ID": id, "TAC": tac, "TPEQP": tpeqp,
+        "OCR": ocr, "NOME": nome,
+        "TIPO": tipo,
     }
 
-    for key in _STAR_FIELDS:      # defaults só para campos “estrela”
-        rule = Pds._schema[key]
-        attrs[key] = str(rule.get("default", ""))
+    # -------- campos estrela (defaults) ---------
+    for key in _STAR_FIELDS:
+        attrs[key] = str(Pds._schema[key].get("default", ""))
 
+    # -------- aplica extras do usuário ----------
+    if extra:
+        for kv in extra:
+            m = _EXTRA_KV.match(kv)
+            if not m:
+                print(f"[red]Formato inválido para --extra: {kv}")
+                raise typer.Exit(1)
+            k, v = m.group(1).upper(), m.group(2)
+            attrs[k] = v
+
+    # -------- valida e grava --------------------
     p = Pds(attrs)
     errs = p.validate()
-
     if errs:
         print("[red]Não foi possível gerar pds.dat:")
         for e in errs:

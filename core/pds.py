@@ -35,9 +35,9 @@ class Pds:
             if key not in self.attrs or not self.attrs[key]:
                 errors.append(f"{key} obrigatório não informado")
 
-        # valida OCR formato
+        # ── verificação de formato do OCR ----------------------------------------
         if "OCR" in self.attrs and not self.OCR_RE.fullmatch(self.attrs["OCR"]):
-            errors.append("OCR deve ter 5 caracteres alfanuméricos + '01' (ex.: ABCDE01)")
+            errors.append("OCR deve ter até 25 caracteres A-Z/0-9 e terminar em '01'")
 
         # regras do YAML (required, enum…)
         for key, rule in schema.items():
@@ -50,19 +50,33 @@ class Pds:
 
         return errors
 
-    ORDER_ABS   = ["ID", "TAC", "TPEQP", "OCR", "NOME"]
-    ORDER_STAR  = ["CDINIC", "STINI", "STNOR",
-                "ALINT", "ALRIN", "ALRP", "INVRT", "SOEIN",
-                "TCL", "TPFIL"]
+    # campos obrigatórios absolutos  (ordem fixada no .dat)
+    ORDER_ABS = ["ID", "TAC", "TPEQP", "OCR", "NOME"]
+
+    # campos “estrela” (defaults sempre gerados)
+    ORDER_STAR = [
+        "CDINIC", "STINI", "STNOR",
+        "ALINT", "ALRIN", "ALRP", "INVRT", "SOEIN",
+        "TCL", "TPFIL",
+]
 
     def to_dat(self) -> str:
+        """Serializa o ponto em ordem: obrigatórios, estrela, demais."""
         def line(k): return f"   {k:<8}= {self.attrs[k]}"
+
         lines = ["PDS"]
+
         # 1) obrigatórios absolutos
-        lines += [line(k) for k in ORDER_ABS if k in self.attrs]
-        # 2) estrela
-        lines += [line(k) for k in ORDER_STAR if k in self.attrs]
-        # 3) quaisquer outros que o usuário tenha fornecido
-        remaining = sorted(k for k in self.attrs if k not in ORDER_ABS+ORDER_STAR)
+        lines += [line(k) for k in self.ORDER_ABS if k in self.attrs]
+
+        # 2) campos estrela
+        lines += [line(k) for k in self.ORDER_STAR if k in self.attrs]
+
+        # 3) demais (alfabético)
+        remaining = sorted(
+            k for k in self.attrs
+            if k not in self.ORDER_ABS and k not in self.ORDER_STAR
+        )
         lines += [line(k) for k in remaining]
+
         return "\n".join(lines) + "\n"

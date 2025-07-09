@@ -59,15 +59,16 @@ _STAR_FIELDS = [
 # --------------------------------------------------------------------------- #
 @app.command("new")
 def cli_new(
-    id:      str = typer.Option(..., "--id", help="ID do ponto"),
-    tac:     str = typer.Option(..., "--tac", help="TAC destino"),
-    tpeqp:   str = typer.Option(..., "--tpeqp", help="Tipo de equipamento"),
-    nome:    str = typer.Option(..., "--nome", help="Descrição do ponto"),
-    ocr:     str = typer.Option(..., "--ocr",  help="Identificador OCR (formato XXXXX01)"),
+    id:      str = typer.Option(..., "--id"),
+    tac:     str = typer.Option(..., "--tac"),
+    tpeqp:   str = typer.Option(..., "--tpeqp"),
+    nome:    str = typer.Option(..., "--nome"),
+    ocr:     str = typer.Option(..., "--ocr"),
     tipo:    str = typer.Option("OUTROS", "--tipo"),
 ) -> None:
-    # obrigatórios absolutos vêm do usuário
-    attrs = {
+    _load_schema()                #  <<  ESTA LINHA VOLTA
+
+    attrs = {                     # obrigatórios absolutos
         "ID": id,
         "TAC": tac,
         "TPEQP": tpeqp,
@@ -75,11 +76,18 @@ def cli_new(
         "NOME": nome,
     }
 
-    # aplica defaults SOMENTE aos campos estrela
-    for key in _STAR_FIELDS:
+    for key in _STAR_FIELDS:      # defaults só para campos “estrela”
         rule = Pds._schema[key]
         attrs[key] = str(rule.get("default", ""))
 
-    # o usuário ainda pode sobrescrever qualquer campo via --extra KEY=VAL (futuro)
-
     p = Pds(attrs)
+    errs = p.validate()
+
+    if errs:
+        print("[red]Não foi possível gerar pds.dat:")
+        for e in errs:
+            print(f" • {e}")
+        raise typer.Exit(1)
+
+    Path("pds.dat").write_text(p.to_dat(), encoding="utf-8")
+    print("[green]Arquivo pds.dat criado/atualizado!")

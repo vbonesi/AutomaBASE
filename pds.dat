@@ -1,0 +1,18 @@
+PDS
+   ID      = USI01_CB101
+   TAC     = TAC_USI01
+   TPEQP   = DISJ
+   OCR     = DISJ10101
+   NOME    = Disjuntor 01 Usina
+   CDINIC  = NORMAL
+   STINI   = F
+   STNOR   = F
+   ALINT   = SIM
+   ALRIN   = NAO
+   ALRP    = NAO
+   INVRT   = NAO
+   SOEIN   = NAO
+   TCL     = NLCL
+   TPFIL   = NLFL
+   SELSD   = SIM
+   TIPO    = OUTROS

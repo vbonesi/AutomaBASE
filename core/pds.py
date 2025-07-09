@@ -50,10 +50,19 @@ class Pds:
 
         return errors
 
-    # ---------- impressor ----------
+    ORDER_ABS   = ["ID", "TAC", "TPEQP", "OCR", "NOME"]
+    ORDER_STAR  = ["CDINIC", "STINI", "STNOR",
+                "ALINT", "ALRIN", "ALRP", "INVRT", "SOEIN",
+                "TCL", "TPFIL"]
+
     def to_dat(self) -> str:
+        def line(k): return f"   {k:<8}= {self.attrs[k]}"
         lines = ["PDS"]
-        for k, v in self.attrs.items():
-            lines.append(f"   {k:<8}= {v}")
-        # sem ';' solto no fim
+        # 1) obrigatórios absolutos
+        lines += [line(k) for k in ORDER_ABS if k in self.attrs]
+        # 2) estrela
+        lines += [line(k) for k in ORDER_STAR if k in self.attrs]
+        # 3) quaisquer outros que o usuário tenha fornecido
+        remaining = sorted(k for k in self.attrs if k not in ORDER_ABS+ORDER_STAR)
+        lines += [line(k) for k in remaining]
         return "\n".join(lines) + "\n"

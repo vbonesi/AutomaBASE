@@ -48,35 +48,38 @@ def cli_validate(
     print("[green]✔ Arquivo válido")
 
 
+_STAR_FIELDS = [
+    "CDINIC", "STINI", "STNOR",
+    "ALINT", "ALRIN", "ALRP", "INVRT", "SOEIN",
+    "TCL", "TPFIL",
+]
+
 # --------------------------------------------------------------------------- #
 # COMANDO: new                                                                #
 # --------------------------------------------------------------------------- #
-@app.command("new")             #  ← decorador que faltava
+@app.command("new")
 def cli_new(
-    id:  str = typer.Option(..., "--id", "-i", help="ID do ponto"),
-    tac: str = typer.Option(..., "--tac", "-t", help="TAC destino"),
-    tipo: str = typer.Option("OUTROS", "--tipo", "-y"),
+    id:      str = typer.Option(..., "--id", help="ID do ponto"),
+    tac:     str = typer.Option(..., "--tac", help="TAC destino"),
+    tpeqp:   str = typer.Option(..., "--tpeqp", help="Tipo de equipamento"),
+    nome:    str = typer.Option(..., "--nome", help="Descrição do ponto"),
+    ocr:     str = typer.Option(..., "--ocr",  help="Identificador OCR (formato XXXXX01)"),
+    tipo:    str = typer.Option("OUTROS", "--tipo"),
 ) -> None:
-    """
-    Gera um arquivo **pds.dat** (nome fixo) contendo todos os defaults.
-    """
-    _load_schema()
+    # obrigatórios absolutos vêm do usuário
+    attrs = {
+        "ID": id,
+        "TAC": tac,
+        "TPEQP": tpeqp,
+        "OCR": ocr,
+        "NOME": nome,
+    }
 
-    # ---------- aplica defaults ----------
-    attrs = {"ID": id, "TAC": tac, "TIPO": tipo}
-    for key, rule in Pds._schema.items():
-        if key not in attrs and "default" in rule:
-            attrs[key] = str(rule["default"])
+    # aplica defaults SOMENTE aos campos estrela
+    for key in _STAR_FIELDS:
+        rule = Pds._schema[key]
+        attrs[key] = str(rule.get("default", ""))
+
+    # o usuário ainda pode sobrescrever qualquer campo via --extra KEY=VAL (futuro)
 
     p = Pds(attrs)
-
-    # ---------- valida antes de gravar ----------
-    errs = p.validate()
-    if errs:
-        print("[red]Não foi possível gerar pds.dat:")
-        for e in errs:
-            print(" •", e)
-        raise typer.Exit(1)
-
-    Path("pds.dat").write_text(p.to_dat(), encoding="utf-8")
-    print("[green]Arquivo pds.dat criado/atualizado!")

@@ -51,43 +51,32 @@ def cli_validate(
 # --------------------------------------------------------------------------- #
 # COMANDO: new                                                                #
 # --------------------------------------------------------------------------- #
-@app.command("new")
+@app.command("new")             #  ← decorador que faltava
 def cli_new(
-    id: str = typer.Option(..., "--id", "-i", help="ID do ponto"),
-    tac: str = typer.Option(..., "--tac", "-t", help="TAC a que o ponto pertence"),
-    tipo: str = typer.Option(
-        "OUTROS",
-        "--tipo",
-        "-y",
-        help="TIPO do ponto (enum; padrão = OUTROS)",
-        show_default=True,
-    ),
-    output: Path = typer.Option(
-        Path("pds.dat"),
-        "--out",
-        "-o",
-        help="Caminho do arquivo de saída",
-        show_default=True,
-    ),
+    id:  str = typer.Option(..., "--id", "-i", help="ID do ponto"),
+    tac: str = typer.Option(..., "--tac", "-t", help="TAC destino"),
+    tipo: str = typer.Option("OUTROS", "--tipo", "-y"),
 ) -> None:
     """
-    Gera um **pds.dat** mínimo contendo ID, TAC e TIPO.
-
-    Exemplo:
-
-        poetry run autobase new --id TESTE1 --tac TAC_EXEMPLO --tipo FLCN -o out.dat
+    Gera um arquivo **pds.dat** (nome fixo) contendo todos os defaults.
     """
     _load_schema()
 
-    p = Pds({"ID": id, "TAC": tac, "TIPO": tipo})
+    # ---------- aplica defaults ----------
+    attrs = {"ID": id, "TAC": tac, "TIPO": tipo}
+    for key, rule in Pds._schema.items():
+        if key not in attrs and "default" in rule:
+            attrs[key] = str(rule["default"])
 
-    # Valida antes de gravar – avisa mas não aborta caso existam alertas
-    warn = p.validate()
-    if warn:
-        print("[yellow]Aviso: ponto gerado contém inconsistências:")
-        for w in warn:
-            print(f"  • {w}")
+    p = Pds(attrs)
 
-    output.write_text(p.to_dat(), encoding="utf-8")
-    print(f"[green]Arquivo gerado em {output.resolve()}")
+    # ---------- valida antes de gravar ----------
+    errs = p.validate()
+    if errs:
+        print("[red]Não foi possível gerar pds.dat:")
+        for e in errs:
+            print(" •", e)
+        raise typer.Exit(1)
 
+    Path("pds.dat").write_text(p.to_dat(), encoding="utf-8")
+    print("[green]Arquivo pds.dat criado/atualizado!")

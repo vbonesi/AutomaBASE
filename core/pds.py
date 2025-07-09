@@ -24,17 +24,30 @@ class Pds:
                 attrs[m.group(1).upper()] = m.group(2)
         return cls(attrs)
 
-    # ---------- validação simples ----------
+    OCR_RE = re.compile(r"^[A-Z0-9]{1,23}01$")   # 2 dígitos finais “01”, total ≤ 25
+
     def validate(self) -> list[str]:
-        errors: list[str] = []
-        for key, rule in self._schema.items():
-            req = rule.get("required")
-            if req == "always" and key not in self.attrs:
+        errors = []
+        schema = self._schema
+
+        # obrigatórios absolutos + programa
+        for key in ("ID", "TAC", "TPEQP", "NOME", "OCR"):
+            if key not in self.attrs or not self.attrs[key]:
                 errors.append(f"{key} obrigatório não informado")
+
+        # valida OCR formato
+        if "OCR" in self.attrs and not self.OCR_RE.fullmatch(self.attrs["OCR"]):
+            errors.append("OCR deve ter 5 caracteres alfanuméricos + '01' (ex.: ABCDE01)")
+
+        # regras do YAML (required, enum…)
+        for key, rule in schema.items():
+            if rule.get("required") == "always" and key not in self.attrs:
+                errors.append(f"{key} obrigatório ausente")
             if key in self.attrs and "enum" in rule:
-                allowed = [v.strip() for v in rule["enum"]]
+                allowed = rule["enum"]
                 if self.attrs[key] not in allowed:
                     errors.append(f"{key}='{self.attrs[key]}' fora de domínio {allowed}")
+
         return errors
 
     # ---------- impressor ----------
@@ -42,5 +55,5 @@ class Pds:
         lines = ["PDS"]
         for k, v in self.attrs.items():
             lines.append(f"   {k:<8}= {v}")
-        lines.append(";")
-        return "\n".join(lines)
+        # sem ';' solto no fim
+        return "\n".join(lines) + "\n"

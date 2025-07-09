@@ -1,164 +1,72 @@
 id: PDS
-description: Entidade Ponto Digital Lógico – SAGE Base-Fonte (atualizada até upd 38)
+description: Entidade Ponto Digital Lógico – SAGE Base-Fonte upd 38
+
 attributes:
 
-  # ─── CHAVE PRIMÁRIA ─────────────────────────────────────────────
+  # ── OBRIGATÓRIOS absolutOS ──────────────────────────────────────
   ID:
-    type: char(48)
-    required: always        # Identificador único (pré-23)
+    type: char(32)
+    required: always
 
-  # ─── OBRIGATÓRIOS GERAIS ────────────────────────────────────────
   TAC:
     type: char(20)
-    required: always        # Chave da TAC – pré-23
-  TIPO:
-    type: enum
-    enum: [ALRP, ALTP, CAG, CAG_CIA, CAG_INTR, CAG_MF, CAG_MI, CAG_SR, CAG_STE, CAG_TRIP, CAG_VP, CHAVE, DISJ, FLCN, LINF, LSUP, OUTROS, PTNI, PTIP, STC, UTR]
     required: always
-    default: OUTROS         # enum expandido no upd 28
-  CDINIC:
-    type: enum
-    enum: [NORMAL, MANUAL, NAOSUP]
-    default: NORMAL         # pré-23
-  STINI:
-    type: enum
-    enum: [A, F]
-    default: F              # pré-23
-  STNOR:
-    type: enum
-    enum: [A, F]
-    default: F              # pré-23
 
-  # ─── FLAGS SIM|NAO ──────────────────────────────────────────────
-  ALINT:
-    type: enum
-    enum: [SIM, NAO]
-    default: NAO            # pré-23
-  ALRIN:
-    type: enum
-    enum: [SIM, NAO]
-    default: NAO            # pré-23
-  BDTR:
-    type: enum
-    enum: [SIM, NAO]
-    default: SIM            # pré-23
-  SOEIN:
-    type: enum
-    enum: [SIM, NAO]
-    default: NAO            # pré-23
-  INVRT:
-    type: enum
-    enum: [SIM, NAO]
-    default: NAO            # pré-23
-  SELSD:
-    type: enum
-    enum: [SIM, NAO]
-    default: NAO            # introduzido no upd 26
-  ATLZINV:
-    type: enum
-    enum: [SIM, NAO]
-    default: NAO            # upd 25 (rotina ATINV)
-  SINCR_MAN:
-    type: enum
-    enum: [SIM, NAO]
-    default: NAO            # upd 24 (sincronismo manual)
-  EE:
-    type: enum
-    enum: [SIM, NAO]
-    default: SIM            # pré-23
-  UAPL:
-    type: enum
-    enum: [SIM, NAO]
-    default: SIM            # pré-23
-  HISTSLC:
-    type: enum
-    enum: [SIM, NAO]
-    default: SIM            # upd 28 (histórico seleções)
-  HISTSLC_SOE:
-    type: enum
-    enum: [SIM, NAO]
-    default: NAO            # upd 28 (histórico SOE)
-  NCOMISS:
-    type: enum
-    enum: [SIM, NAO]
-    default: NAO            # upd 27 (flag não-comissionado)
-
-  # ─── RELACIONAMENTOS OPCIONAIS ─────────────────────────────────
-  OCR:
-    type: char(20)
-    required: never         # pré-23
-  TELA:
-    type: char(50)
-    required: never         # introduzido no upd 22 (SigDraw link)
- 
-  # ─── RELACIONAMENTOS / CÁLCULO ───────────────────────────────────────
-  # TCL  – Nome do cálculo associado ao ponto.
-  #        • Valor-padrão: NLCL  ➜ “Ausência de Cálculo”.
-  #        • Se o ponto for marcado como calculado, informe um ID existente
-  #          na entidade TCL ou em calculos.c.
-  #        • IDs já definidos na base demo (upd 38):
-  #          NLCL, PA, SOMA, CORRENTE, AMPSHUNT, FPOT, OU, ANDNOT, SUB, MULT,
-  #          DIV, RAIZ2, NEGA, INVERSO, DISKM, FREQ, INTEQP, E, NOU2, NOU,
-  #          OUN2, INTEDJ, INTESDV, SEL, INDI, CONV0DI, CONV1DI, CONV2DI,
-  #          ANA2, ANA4, ANA3, TIMER, CPU, BYPASS, MVALOR, MVALORP, PERCENT,
-  #          AMPD, SOMAABS
-  #        • Outros IDs podem ser adicionados conforme novos cálculos
-  #          sejam implementados.
-  TCL:
-    type: char(8)
-    default: NLCL
-    required_if: calculado
-
-  # ─── CONVERSÃO / HISTÓRICO ─────────────────────────────────────
-  TPFIL:
-    type: enum
-    enum: [NLFL, FIL1, FIL2, FIL3, FIL4, FIL5, FIL6, FIL7, FIL8, FIL9]
-    default: NLFL           # FIL8/9 criados no upd 30
-  PRIOALR:
-    type: int(1)
-    default: 6              # **novo no upd 30**
-  PCONDALR:
-    type: int(1)
-    required: never         # introduzido no upd 28
-  TMP_ANORM:
-    type: int
-    default: 0              # introduzido no upd 28
-  VLINIC:
-    type: real
-    default: 0              # upd 24 (valor lógico inicial)
-
-  # ─── PROTOCOLO ICCP (CONDICIONAL) ───────────────────────────────
-  IDICCP:
-    type: char(32)
-    required_if: exported_iccp  # criado no upd 23
-
-  # ─── EQUIPAMENTO / CLASSIFICAÇÃO ───────────────────────────────
   TPEQP:
     type: enum
-    enum: [ACO, ARE, BAH, BCP, CAG, CAR, CIA, CLI, CNC, CNV, COS, .CRE, CSE, CSI, ELE, .EST, ESTM, GUSI, INS, LDC, LTR, RAM, REA, REG, REGH, RESV, RIO, SBA, SIS, SME, TAC, TR2, TR3, UDE, UFE, UGE, UTR, USI]
-    required: always          # tornou-se obrigatório no upd 23
+    enum: [ACO, ARE, BAH, BCP, CAG, CAR, CIA, CLI, CNC, CNV, COS, .CRE,
+           CSE, CSI, ELE, .EST, ESTM, GUSI, INS, LDC, LTR, RAM, REA, REG,
+           REGH, RESV, RIO, SBA, SIS, SME, TAC, TR2, TR3, UDE, UFE, UGE,
+           UTR, USI]
+    required: always
 
-  # ─── METADADOS ─────────────────────────────────────────────────
-  CMT:
-    type: char(200)
-    required: never         # pré-23
-  MRID:
-    type: char(50)
-    system: true
-    required: never         # upd 25 (integração IEC-61850)
-
-  # ─── TEXTO LIVRE ───────────────────────────────────────────────
   NOME:
     type: char(63)
-    required: never         # pré-23
-  DESC1:
-    type: char(40)
-    required: never         # pré-23
-  DESC2:
-    type: char(40)
-    required: never         # pré-23
+    default: ""          # programa exige preenchimento
 
-  # ─── CLASSIFICAÇÃO ADICIONAL ──────────────────────────────────
-  SUBTIPO1:
-    type: char(8)
-    required: never         # adicionada no upd 26 (sub-classe)
+  OCR:
+    type: char(25)
+    default: XXXXX01     # programa exige OCR no formato XXXXX01
+
+  # ── CAMPOS com default sempre gerados ───────────────────────────
+  CDINIC:   {type: enum, enum: [NORMAL, MANUAL, NAOSUP], default: NORMAL}
+  STINI:    {type: enum, enum: [A, F], default: F}
+  STNOR:    {type: enum, enum: [A, F], default: F}
+  ALINT:    {type: enum, enum: [SIM, NAO], default: NAO}
+  ALRIN:    {type: enum, enum: [SIM, NAO], default: NAO}
+  ALRP:     {type: enum, enum: [SIM, NAO], default: NAO}
+  INVRT:    {type: enum, enum: [SIM, NAO], default: NAO}
+  SOEIN:    {type: enum, enum: [SIM, NAO], default: NAO}
+  TPFIL:    {type: enum, enum: [NLFL, FIL1, FIL2, FIL3, FIL4,
+                                FIL5, FIL6, FIL7, FIL8, FIL9], default: NLFL}
+
+  # ── OPCIONAIS padrão / nulo ─────────────────────────────────────
+  BDTR:        {type: enum, enum: [SIM, NAO], default: SIM}
+  SELSD:       {type: enum, enum: [SIM, NAO], default: NAO}
+  ATLZINV:     {type: enum, enum: [SIM, NAO], default: NAO}
+  SINCR_MAN:   {type: enum, enum: [SIM, NAO], default: NAO}
+  EE:          {type: enum, enum: [SIM, NAO], default: SIM}
+  UAPL:        {type: enum, enum: [SIM, NAO], default: NAO}
+  HISTSLC:     {type: enum, enum: [SIM, NAO], default: SIM}
+  HISTSLC_SOE: {type: enum, enum: [SIM, NAO], default: NAO}
+  NCOMISS:     {type: enum, enum: [SIM, NAO], default: NAO}
+
+  TELA:        {type: char(50)}
+  PCONDALR:    {type: char(32)}
+  PRIOALR:     {type: int,  default: 0}
+  TMP_ANORM:   {type: int,  default: 0}
+
+  TCL:
+    type: char(11)
+    default: NLCL
+    required_if: calculado          # validação condicional virá depois
+
+  IDICCP:
+    type: char(32)
+    required_if: exported_iccp
+
+  CMT:       {type: char(200)}
+  MRID:      {type: char(50), system: true}
+  DESC1:     {type: char(40)}
+  DESC2:     {type: char(40)}
+  SUBTIPO1:  {type: char(8)}

@@ -1,0 +1,18 @@
+id: PDD
+description: Entidade Ponto Digital de Distribuição – SAGE Base-Fonte (rev 38)
+
+attributes:
+
+  # ── CHAVE PRIMÁRIA ─────────────────────────────────────────────
+  ID:                # identificador do ponto de distribuição digital
+    type: char(48)
+    required: always          # presente desde as primeiras versões  :contentReference[oaicite:16]{index=16}
+
+  # ── CHAVES ESTRANGEIRAS ───────────────────────────────────────
+  PDS:               # ponto digital lógico de origem
+    type: char(32)
+    required: always          # relacionamento 1→n PDS→PDD  :contentReference[oaicite:17]{index=17}
+
+  TDD:               # terminal de distribuição de dados
+    type: char(12)
+    required: always          # relacionamento 1→n TDD→PDD  :contentReference[oaicite:18]{index=18}

@@ -1,0 +1,39 @@
+id: PDF
+description: Entidade Ponto Digital Físico – SAGE Base-Fonte (rev 38)
+
+attributes:
+
+  # ── CHAVE PRIMÁRIA ─────────────────────────────────────────────
+  ID:                  # identificador do ponto digital físico
+    type: char(48)
+    required: always   # sempre presente desde as versões iniciais <27-?->
+
+  # ── CHAVE ESTRANGEIRA DIRETA ──────────────────────────────────
+  NV2:                 # nível-2 físico ao qual pertence
+    type: char(20)
+    required: always   # existe desde Base 27  :contentReference[oaicite:10]{index=10}
+
+  # ── RELACIONAMENTO (aquisição/distribuição) ───────────────────
+  PNT:                 # ponto lógico associado (PDS | PDD)
+    type: char(48)
+    required: never    # opcional; <NULO> se filtro composto  :contentReference[oaicite:11]{index=11}
+
+  TPPNT:               # tipo do ponto físico: PDS ou PDD
+    type: char(3)
+    default: ""        # criado em upd 28-x  :contentReference[oaicite:12]{index=12}
+
+  # ── POSICIONAMENTO NO NV2 ─────────────────────────────────────
+  ORDEM:
+    type: int(4)
+    default: 1         # sequência 1…n dentro do NV2  :contentReference[oaicite:13]{index=13}
+
+  # ── CONVERSÃO/PROTOCOLO ───────────────────────────────────────
+  KCONV:
+    type: char(4)
+    default: NOR       # domínio INV,NOR,SQI… – desde versões iniciais  :contentReference[oaicite:14]{index=14}
+
+  # ── METADADOS OPCIONAIS ───────────────────────────────────────
+  DESC1:               # info complementar 1
+    type: char(40)     # opcional – sempre <NULO> por padrão  :contentReference[oaicite:15]{index=15}
+  DESC2:
+    type: char(40)     # info complementar 2
